@@ -3,11 +3,11 @@ package com.jmp.jmp_japan_music_player.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jmp.jmp_japan_music_player.domain.ApiResponse;
 import com.jmp.jmp_japan_music_player.domain.User;
 import com.jmp.jmp_japan_music_player.service.UserService;
+import com.jmp.jmp_japan_music_player.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +20,7 @@ import java.net.URI;
 public class UserController {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final UserService userService;
-
+    private UserUtil userUtil;
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -30,7 +30,10 @@ public class UserController {
         //do
         log.info("registerUser-> userId : {} , userName : {}" , user.getId() , user.getUserName());
         //service
-        String resTxt = userService.User_register_service(user);
+        String resTxt = "utilCheck Fail";
+        if (userUtil.registerCheckUser(user) == true){
+            resTxt = userService.User_register_service(user);
+        }
         //checker
         String json = objectMapper.writeValueAsString(resTxt);
 
